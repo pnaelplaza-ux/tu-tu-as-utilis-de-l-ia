@@ -1,0 +1,14 @@
+/* Full-bleed canvas, no UI clutter (mobile-first) */
+html,body{
+  height:100%;
+  margin:0;
+  background:#111;
+}
+canvas{
+  display:block;
+  width:100vw;
+  height:100vh;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
