@@ -1,10 +1,3 @@
-/*
-Infinite tiled canvas optimized:
-- Uses a cached CanvasPattern instead of looping drawImage per tile.
-- Renders only on state changes via a dirty flag + requestRender to avoid continuous draws.
-- Keeps interaction semantics (pan, pinch, wheel zoom, momentum) but triggers draws only when needed.
-*/
-
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 
