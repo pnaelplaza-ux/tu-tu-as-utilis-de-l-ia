@@ -1,3 +1,10 @@
+/*
+Infinite tiled canvas optimized:
+- Uses a cached CanvasPattern instead of looping drawImage per tile.
+- Renders only on state changes via a dirty flag + requestRender to avoid continuous draws.
+- Keeps interaction semantics (pan, pinch, wheel zoom, momentum) but triggers draws only when needed.
+*/
+
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 
@@ -37,7 +44,7 @@ addEventListener('resize', resize);
 
 // Load image
 const img = new Image();
-img.src = '/Screenshot_20260502_134804_TikTok.jpg';
+img.src = './Screenshot_20260502_134804_TikTok.jpg';
 img.onload = () => {
   // store original image natural size
   const baseW = img.naturalWidth || img.width;
@@ -244,6 +251,9 @@ canvas.addEventListener('wheel', (e) => {
 /* Touch pinch-to-zoom support (simple) + multitouch flag for pointer pan suspension */
 let pinch = { active:false, id1:null, id2:null, startDist:0, startScale:1, mid:{x:0,y:0} };
 canvas.addEventListener('touchstart', (e) => {
+  // record touch activity to ignore immediately-following wheel events
+  lastTouchTime = Date.now();
+
   // if two fingers start, enable pinch mode and disable single-pointer pan
   if (e.touches.length >= 2) {
     pinch.active = true;
@@ -258,6 +268,9 @@ canvas.addEventListener('touchstart', (e) => {
   }
 });
 canvas.addEventListener('touchmove', (e) => {
+  // update recent touch timestamp for any touch move so subsequent wheel events are ignored briefly
+  lastTouchTime = Date.now();
+
   if (pinch.active && e.touches.length >= 2) {
     const a = e.touches[0], b = e.touches[1];
     const d = dist(a,b);
